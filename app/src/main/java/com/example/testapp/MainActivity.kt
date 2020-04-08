@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
     private var dy: Int = 0
     private var layoutMngr: LinearLayoutManager? = null
     private var flag1: Boolean = false
+    private var firstVisibleItem:Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,23 +32,31 @@ class MainActivity : AppCompatActivity() {
         layoutMngr = LinearLayoutManager(baseContext, RecyclerView.VERTICAL, false)
         recycler_view.apply {
             layoutManager = layoutMngr
+            firstVisibleItem = layoutMngr!!.findFirstVisibleItemPosition()
             adapter = RvAdapter(getBooksList())
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrollStateChanged(recyclerView: RecyclerView, newState: Int) {
                     when (newState) {
                         RecyclerView.SCROLL_STATE_IDLE -> {
+                            flag1 = false
+
 
                         }
                         RecyclerView.SCROLL_STATE_DRAGGING -> {
                             flag1 = true
+
                         }
                         RecyclerView.SCROLL_STATE_SETTLING -> {
+                            flag1 = false
                         }
                     }
                 }
 
                 override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
-                    if (dy > 0 && lay1.visibility == View.VISIBLE ) {
+
+                    var currentVisibleItem = layoutMngr!!.findFirstVisibleItemPosition()
+
+                    if(currentVisibleItem > firstVisibleItem){
                         val animSlideDown =
                             AnimationUtils.loadAnimation(applicationContext, R.anim.slideup)
                         animSlideDown.setAnimationListener(object : Animation.AnimationListener {
@@ -66,8 +75,11 @@ class MainActivity : AppCompatActivity() {
 
                         })
                         lay1.startAnimation(animSlideDown)
+                        Log.i("RecyclerView scrolled: ", "scroll up!");
 
-                    } else if (dy < 0 && lay1.visibility != View.VISIBLE ) {
+                    }
+
+                    else{
                         val animSlideDown =
                             AnimationUtils.loadAnimation(applicationContext, R.anim.slidedown)
                         animSlideDown.setAnimationListener(object : Animation.AnimationListener {
@@ -83,10 +95,56 @@ class MainActivity : AppCompatActivity() {
 
                             }
 
+                            
+
                         })
                         lay1.startAnimation(animSlideDown)
-
+                        Log.i("RecyclerView scrolled: ", "scroll down!");
                     }
+
+
+                    firstVisibleItem = currentVisibleItem;
+
+//                    if (dy > 0 && lay1.visibility == View.VISIBLE && flag1 ) {
+//                        val animSlideDown =
+//                            AnimationUtils.loadAnimation(applicationContext, R.anim.slideup)
+//                        animSlideDown.setAnimationListener(object : Animation.AnimationListener {
+//                            override fun onAnimationRepeat(p0: Animation?) {
+//
+//                            }
+//
+//                            override fun onAnimationEnd(p0: Animation?) {
+//                                lay1.visibility = View.GONE
+//
+//                            }
+//
+//                            override fun onAnimationStart(p0: Animation?) {
+//
+//                            }
+//
+//                        })
+//                        lay1.startAnimation(animSlideDown)
+//
+//                    } else if (dy < 0 && lay1.visibility != View.VISIBLE && flag1 ) {
+//                        val animSlideDown =
+//                            AnimationUtils.loadAnimation(applicationContext, R.anim.slidedown)
+//                        animSlideDown.setAnimationListener(object : Animation.AnimationListener {
+//                            override fun onAnimationRepeat(p0: Animation?) {
+//                            }
+//
+//                            override fun onAnimationEnd(p0: Animation?) {
+//                                lay1.visibility = View.VISIBLE
+//
+//                            }
+//
+//                            override fun onAnimationStart(p0: Animation?) {
+//
+//                            }
+//
+//                        })
+//                        lay1.startAnimation(animSlideDown)
+//
+//                    }
                 }
             })
         }
